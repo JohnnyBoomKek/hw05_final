@@ -1,0 +1,64 @@
+{% extends "base.html" %} 
+{% block title %} @{{ user.username }} {% endblock %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                    <div class="card">
+                            <div class="card-body">
+                                    <div class="h2">
+                                        
+                                        <!-- Имя автора -->
+                                        {{ user.first_name}} {{ user.last_name}}
+                                    </div>
+                                    <div class="h3 text-muted">
+                                         <!-- username автора -->
+                                         @{{ user.username }}
+                                    </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                            <div class="h6 text-muted">
+                                            Подписчиков: {{ user.following.all.count }} <br />
+                                            Подписан: {{ user.follower.all.count }}
+                                            </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="h6 text-muted">
+                                            <!-- Количество записей -->
+                                            Записей: {{ posts_cnt }}
+                                        </div>
+                                {% if NotMyPageFlag %} 
+                                    <li class="list-group-item">
+                                        {% if following %}
+                                        <a class="btn btn-lg btn-light" 
+                                                href="{% url 'profile_unfollow' user.username %}" role="button"> 
+                                                Отписаться 
+                                        </a> 
+                                        {% else %}
+                                        <a class="btn btn-lg btn-primary" 
+                                                href="{% url 'profile_follow' user.username %}" role="button">
+                                        Подписаться 
+                                        </a>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            </ul>
+                    </div>
+            </div>
+
+            <div >                
+                {% for post in page %}
+                {% include "post_item.html" with post=post %}
+                {% endfor %}
+                <!-- Остальные посты -->  
+
+                <!-- Здесь постраничная навигация паджинатора -->
+                {% if page.has_other_pages %}
+                    {% include "paginator.html" with items=page paginator=paginator%}
+                {% endif %}
+
+     </div>
+    </div>
+</main>
+{% endblock %}
