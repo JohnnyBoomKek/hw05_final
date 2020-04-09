@@ -52,7 +52,7 @@ def new(request):
     context = {'form': form} 
     return render(request, 'new.html', context) 
 
-@login_required
+
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     author = User.objects.get(username=username)
