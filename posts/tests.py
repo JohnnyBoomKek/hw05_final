@@ -97,7 +97,7 @@ class ProfileTest(TestCase):
                 self.client.get(f'/{self.user2.username}/follow', follow=True)#могу фолловиться 
                 response = self.client.get('/follow/')
                 self.assertContains(response, post.text)#проверяю что есть пост у авторов подписок
-                self.client.get(f'/{self.user2.username}/unfollow/', follow=True)#могу анфоловиться 
+                self.client.get(f'/{self.user2.username}/unfollow', follow=True)#могу анфоловиться 
                 response_new = self.client.get('/follow/')#проверяю что нету если не подписан
                 #print(response_new.content.decode('utf-8'))
                 self.assertNotContains(response_new, post.text)
