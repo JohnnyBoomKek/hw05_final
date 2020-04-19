@@ -1,4 +1,3 @@
-import time
 from django.test import TestCase, Client, override_settings
 from .models import User, Post, Follow
 from yatube import settings
@@ -66,7 +65,7 @@ class ProfileTest(TestCase):
         self.client.force_login(self.user)
         post = Post.objects.create(
             text='This is a new post with no image', author=self.user)
-        with open("media\\posts\\img.jpeg", 'rb') as img:
+        with open("media/posts/img.png", 'rb') as img:
             self.client.post(f"/{self.user.username}/{post.id}/edit/", {
                              'text': 'This post is supposed to be with an image', 'image': img}, follow=True)
         post_response = self.client.get(f'/{self.user.username}/{post.id}/')
@@ -78,23 +77,27 @@ class ProfileTest(TestCase):
 
     def test_unable_to_upload_anonimg(self):
         self.client.force_login(self.user)
-        with open("media\posts\\readme.txt") as txt:
+        with open("media/posts/readme.txt") as txt:
             self.client.post(
                 f"/new", {'text': 'This post is supposed to be with an image', 'image': txt}, follow=True)
         index_response = self.client.get('/')
         self.assertNotContains(index_response, "img")
 
-    def test_chached_posts(self):
+    def test_cached_posts(self):
         self.client.force_login(self.user)
         post = Post.objects.create(
             text='This is a new post. It shouldnt be seen right away.', author=self.user)
         index_response = self.client.get('/')
         self.assertNotContains(index_response, post.text)
-        time.sleep(11)  # другого способа не придумал, сорян.
+
+    @override_settings(CACHES=settings.TEST_CACHES)
+    def test_noncached_posts(self):
+        self.client.force_login(self.user)
+        post = Post.objects.create(
+            text='This is a new post. It should be seen right away.', author=self.user)
         index_response = self.client.get('/')
         self.assertContains(index_response, post.text)
 
-    # тесты 1 и 2. Вроде как проверяется и первый и второй тест тут.
     @override_settings(CACHES=settings.TEST_CACHES)
     def test_authed_user_can_sub_unsub(self):
         self.client.force_login(self.user)
